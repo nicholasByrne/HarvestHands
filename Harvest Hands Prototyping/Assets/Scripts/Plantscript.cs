@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class Plantscript : MonoBehaviour {
+public class Plantscript : NetworkBehaviour {
 
-    public bool ReadyToHarvest = false;
+    [SyncVar] public bool ReadyToHarvest = false;
+    [SyncVar]
+    public NetworkInstanceId parentNetId;
 
     [Tooltip("1.0 = 1 full day")]
     public float TimeToGrow;
@@ -16,33 +19,46 @@ public class Plantscript : MonoBehaviour {
 
     public Material HarvestMaterial;
     public GameObject plantProducePrefab;
+
+    [SyncVar] public bool isWatered = false;
     
 
     // Use this for initialization
     void Start ()
     {
-        
+        if (ReadyToHarvest)
+        {
+            GetComponent<Renderer>().material = HarvestMaterial;
+        }
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    public override void OnStartClient()
     {
-	    //if (!ReadyToHarvest)
-        //{
-        //    if (dayNightController.ingameDay  >= dayPlanted + TimeToGrow)
-        //    {
-        //        ReadyToHarvest = true;
-        //        GetComponent<Renderer>().material = HarvestMaterial;
-        //    }
-        //}
+        base.OnStartClient();
+
+        GameObject parentObject = ClientScene.FindLocalObject(parentNetId);
+        transform.SetParent(parentObject.transform);
+
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+	    
 	}
 
-    public void Harvest()
+
+
+    [Command]
+    public void CmdHarvest()
     {
         //create produce
         GameObject produce = Instantiate(plantProducePrefab);
         produce.GetComponent<PlantProduce>().ProduceAmount = Random.Range(minSeedsProduced, maxSeedsProduced);
         produce.transform.position = transform.position;
+
+        //Spawn on server
+        NetworkServer.Spawn(produce);
 
         GetComponentInParent<SoilScript>().occupied = false;
 

@@ -5,6 +5,7 @@ public class PlantProduce : MonoBehaviour
 {
 
     public int ProduceAmount = 1;
+    public int score = 10;
 
     
 
@@ -14,7 +15,19 @@ public class PlantProduce : MonoBehaviour
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
 	
 	}
+
+    //void OnTriggerEnter(Collider col)
+    //{
+    //    if (col.gameObject.CompareTag("DropOffZone"))
+    //    {
+    //        PlantProduce produce = col.gameObject.GetComponent<PlantProduce>();
+    //        PlayerInventory inventory = GameObject.Find("Player").GetComponent<PlayerInventory>();
+    //        inventory.playerScore += score;
+    //        Destroy(gameObject);
+    //    }
+    //}
 }

@@ -1,18 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
-public class DayNightController : MonoBehaviour
+
+public class DayNightController : NetworkBehaviour
 {
-    public int ingameDay = 0;
+    [SyncVar] public int ingameDay = 0;
     [Tooltip("Real world second per in-game day")]
     public float secondsInDay = 120f;
 
     [Tooltip("0 (midnight), 0.25 (sunrise), 0.5 (midday), 0.75(sunset), 1 (midnight)")]
     //[Tooltip("0 (sunrise) - 1 (sunset)")]
+
     [Range(0, 1)]
-    public float currentTimeOfDay = 0;
-    public float timeMulitplier = 1f;
+    [SyncVar] public float currentTimeOfDay = 0;
+    [SyncVar] public float timeMulitplier = 1f;
 
     public float startDayAt = 0.25f;
     public float endDayAt = 0.75f;

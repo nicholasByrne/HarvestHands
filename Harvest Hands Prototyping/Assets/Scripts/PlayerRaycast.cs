@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class PlayerRaycast : MonoBehaviour {
 
+public class PlayerRaycast : NetworkBehaviour
+{
     [SerializeField]
     private float RayCastDist;
 
@@ -18,6 +20,11 @@ public class PlayerRaycast : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        if(!isLocalPlayer)
+        {
+            return;
+        }
+
         //Check if an object is with in RayCastDistance
         RaycastHit hit;
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0.0f));
@@ -26,13 +33,13 @@ public class PlayerRaycast : MonoBehaviour {
         {
             //Debug.Log(hit.collider.gameObject.name);
 
-
+            /*
             //If looking at Seed
             if (hit.collider.CompareTag("Seed"))
             {
                 if (Input.GetKeyDown("f"))
                 {
-                    hit.transform.GetComponent<SeedScript>().CollectSeed();
+                    hit.transform.GetComponent<SeedScript>().CmdCollectSeed();
                 }
             }
 
@@ -47,7 +54,7 @@ public class PlayerRaycast : MonoBehaviour {
                         if (inventory.SeedCount > 0)
                         {
                             inventory.SeedCount--;
-                            soil.PlantSeed(); // pass in type of seed?
+                            soil.CmdPlantSeed(); // pass in type of seed?
                         }
                         else
                             Debug.Log("Out of seeds.");
@@ -66,7 +73,7 @@ public class PlayerRaycast : MonoBehaviour {
                     {
                         if (plant.ReadyToHarvest)
                         {
-                            plant.Harvest();
+                            plant.CmdHarvest();
                         }
                     }
                 }
@@ -81,7 +88,7 @@ public class PlayerRaycast : MonoBehaviour {
                     Destroy(hit.transform.gameObject);
                 }
             }
-
+            */
 
 
 

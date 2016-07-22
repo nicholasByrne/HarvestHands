@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class SoilScript : MonoBehaviour {
+public class SoilScript : NetworkBehaviour {
 
-    public bool occupied = false;
+    [SyncVar] public bool occupied = false;
 
     public GameObject plantPrefab;
 
@@ -20,8 +21,8 @@ public class SoilScript : MonoBehaviour {
 	
 	}
 
-
-    public void PlantSeed()
+    [Command]
+    public void CmdPlantSeed()
     {
         //create plant
         GameObject myNewPlant = Instantiate(plantPrefab);
@@ -33,5 +34,12 @@ public class SoilScript : MonoBehaviour {
         Plantscript plantScript = myNewPlant.GetComponent<Plantscript>();
         plantScript.dayPlanted = dayNightController.ingameDay;
         plantScript.TimeToGrow = 1;
+
+        plantScript.parentNetId = netId;
+
+        //Add plant to server
+        NetworkServer.Spawn(myNewPlant);
     }
+        
+
 }
