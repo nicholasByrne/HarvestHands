@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class StaffNo3 : MonoBehaviour
+public class StaffNo3 : NetworkBehaviour
 {
 
 
@@ -41,6 +42,9 @@ public class StaffNo3 : MonoBehaviour
 
     public float GrabDistance = 3.0f;
 
+    [SyncVar]
+    public NetworkInstanceId carriedItemID;
+
     // Use this for initialization
     void Start()
     {
@@ -78,7 +82,30 @@ public class StaffNo3 : MonoBehaviour
     void Update()
     {
 
-        
+        if (!isLocalPlayer)
+        {
+            if (!objectheld)
+            {
+                if (carriedItemID != NetworkInstanceId.Invalid)
+                {
+                    GameObject heldItem = ClientScene.FindLocalObject(carriedItemID);
+                    ChosenObj = heldItem;
+                    ChosenObj.transform.parent = StaffGrabber.transform;
+                    objectheld = true;
+                }
+            }
+            else
+            {
+                if (carriedItemID == NetworkInstanceId.Invalid)
+                {
+                    ChosenObj.transform.parent = null;
+                    ChosenObj = null;
+                    objectheld = false;
+
+                }
+            }
+                return;
+        }
 
         if (objectheld == false)
         {
@@ -98,16 +125,23 @@ public class StaffNo3 : MonoBehaviour
                     if ((Hit.collider.gameObject.GetComponent<Pickupable>() != null))
                     {
                         Debug.Log("SUCESS");
-
-
-
+                        
+                        
                         ChosenObj = Hit.collider.gameObject;
 
+                        //check that another player isn't holding the object
+                        if (!ChosenObj.GetComponent<Pickupable>().beingHeld)
+                        {
+                            objectheld = true;
+                            ChosenObj.transform.parent = StaffGrabber.transform;
+                            ChosenObj.GetComponent<Rigidbody>().useGravity = false;
+                            carriedItemID = ChosenObj.GetComponent<NetworkIdentity>().netId;
 
-                        objectheld = true;
-                        ChosenObj.transform.parent = StaffGrabber.transform;
-                        ChosenObj.GetComponent<Rigidbody>().useGravity = false;
-
+                        }
+                        else
+                        {
+                            ChosenObj = null;
+                        }
 
                     }
                 }
@@ -133,8 +167,8 @@ public class StaffNo3 : MonoBehaviour
                 ChosenObj.transform.parent = null;
 
 
-                ChosenObj.GetComponent<Rigidbody>().AddForce(transform.forward * throwforce); 
-
+                ChosenObj.GetComponent<Rigidbody>().AddForce(transform.forward * throwforce);
+                carriedItemID = NetworkInstanceId.Invalid;
 
                 objectheld = false;
             }
@@ -160,6 +194,7 @@ public class StaffNo3 : MonoBehaviour
             ChosenObj.GetComponent<Rigidbody>().useGravity = true;
             ChosenObj.transform.parent = null;
             objectheld = false;
+            carriedItemID = NetworkInstanceId.Invalid;
         }
 
     }

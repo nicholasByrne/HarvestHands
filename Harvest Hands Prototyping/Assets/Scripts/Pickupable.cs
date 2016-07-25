@@ -1,10 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class Pickupable : MonoBehaviour {
+public class Pickupable : NetworkBehaviour
+{
+    [SyncVar]
+    public bool beingHeld;
+    [SyncVar]
+    public NetworkInstanceId parentNetId;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 	
 	}
 	
@@ -12,4 +18,6 @@ public class Pickupable : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    
 }
