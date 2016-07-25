@@ -25,7 +25,7 @@ public class PlayerInventory : NetworkBehaviour {
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.E))
         {
             //spawns seed infront of player
             //shop.CmdSpawnSeeds(transform.position + transform.forward * 2, transform.rotation);
