@@ -28,7 +28,7 @@ public class SoilScript : NetworkBehaviour {
         GameObject myNewPlant = Instantiate(plantPrefab);
         myNewPlant.transform.parent = gameObject.transform;
         myNewPlant.transform.localPosition = plantPrefab.transform.position;
-        myNewPlant.transform.localScale = plantPrefab.transform.localScale;
+        //myNewPlant.transform.localScale = plantPrefab.transform.localScale;
 
         //set plant details
         Plantscript plantScript = myNewPlant.GetComponent<Plantscript>();

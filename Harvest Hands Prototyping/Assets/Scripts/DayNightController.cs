@@ -27,12 +27,20 @@ public class DayNightController : NetworkBehaviour
 
     float sunInitialIntensity;
 
+    private NetworkStartPosition[] spawnPoints;
+    private ShopScript shop;
+    [SerializeField]
+    [Tooltip("Score lost per player that died")]
+    int deathPenalty = 0;
+
     
 	// Use this for initialization
 	void Start ()
     {
         sky = RenderSettings.skybox;
         sunInitialIntensity = sun.intensity;
+        spawnPoints = FindObjectsOfType<NetworkStartPosition>();
+        shop = FindObjectOfType<ShopScript>();
     }
 
     // Update is called once per frame
@@ -52,6 +60,7 @@ public class DayNightController : NetworkBehaviour
             currentTimeOfDay = startDayAt;
             ingameDay++;
             UpdatePlants();
+            CheckPlayersSafe();            
         }
 
 
@@ -110,6 +119,33 @@ public class DayNightController : NetworkBehaviour
                 }
             }
         }
+    }
+
+    void CheckPlayersSafe()
+    {
+        GameObject[] Players = GameObject.FindGameObjectsWithTag("Player");
+        int playersDead = 0;
+        
+
+        foreach(GameObject player in Players)
+        {
+            //if player is NOT safe
+            if (!player.GetComponent<PlayerInventory>().isSafe)
+            {
+                playersDead++;
+                int respawnIndex = Random.Range(0, spawnPoints.Length -1);
+                player.transform.position = spawnPoints[respawnIndex].transform.position;
+                player.transform.rotation = spawnPoints[respawnIndex].transform.rotation;
+                
+            }
+        }
+        int scoreLost = deathPenalty * playersDead;
+        Debug.Log(shop.Score + " - " + scoreLost);
+        shop.Score -= scoreLost;
+        Debug.Log(shop.Score);
+
+
+
     }
 
 }
