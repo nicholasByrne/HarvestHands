@@ -28,13 +28,15 @@ public class StaffNo3 : NetworkBehaviour
     Vector3 lastPos;
     Vector3 lastPosRot;
 
+    [SyncVar]
+    [SerializeField]
     bool objectheld;
 
    
     float timeLeft;
 
 
-
+    [SyncVar]
     GameObject ChosenObj;
     Camera m_Camera;
 
@@ -62,8 +64,9 @@ public class StaffNo3 : NetworkBehaviour
         WaterPuddle = GameObject.Find("Puddle");
         BucketWater = GameObject.Find("BucketWater");
         PuddleEmpty = false;
-        StaffGrabber = GameObject.Find("Staff Grabber");
+        StaffGrabber = transform.FindChild("Staff Grabber").gameObject;
 
+        carriedItemID = NetworkInstanceId.Invalid;
 
 
         objectheld = false;
@@ -71,11 +74,18 @@ public class StaffNo3 : NetworkBehaviour
         timeLeft = 0.02f;
 
 
-        lastPos = ChosenObj.transform.position;
-        lastPosRot = ChosenObj.transform.rotation.eulerAngles;
+        //lastPos = ChosenObj.transform.position;
+        //lastPosRot = ChosenObj.transform.rotation.eulerAngles;
 
        // throwforce = 500f;
 
+    }
+
+    [Command]
+    public void CmdPickUp(NetworkInstanceId pickedUpObject)
+    {
+        carriedItemID = pickedUpObject;
+        Debug.Log("commanded triggered: remote player carriedItemID" + carriedItemID);
     }
 
     // Update is called once per frame
@@ -84,13 +94,25 @@ public class StaffNo3 : NetworkBehaviour
 
         if (!isLocalPlayer)
         {
+            Debug.Log("is remote player");
+            if (ChosenObj)
+            { 
+                Debug.Log("object pos1: " + ChosenObj.transform.position);
+                Debug.Log("staffgrabber pos1: " + StaffGrabber.transform.position);
+            }
             if (!objectheld)
             {
+                Debug.Log("remote player not holding object");
+                Debug.Log("remote player carriedItemID" + carriedItemID);
+
                 if (carriedItemID != NetworkInstanceId.Invalid)
                 {
+                    Debug.Log("remote player picking up object:" + carriedItemID);
                     GameObject heldItem = ClientScene.FindLocalObject(carriedItemID);
                     ChosenObj = heldItem;
                     ChosenObj.transform.parent = StaffGrabber.transform;
+                    Debug.Log("object pos2: " + ChosenObj.transform.position);
+                    Debug.Log("staffgrabber pos2: " + StaffGrabber.transform.position);
                     objectheld = true;
                 }
             }
@@ -124,7 +146,7 @@ public class StaffNo3 : NetworkBehaviour
 
                     if ((Hit.collider.gameObject.GetComponent<Pickupable>() != null))
                     {
-                        Debug.Log("SUCESS");
+                        //Debug.Log("SUCESS");
                         
                         
                         ChosenObj = Hit.collider.gameObject;
@@ -136,6 +158,7 @@ public class StaffNo3 : NetworkBehaviour
                             ChosenObj.transform.parent = StaffGrabber.transform;
                             ChosenObj.GetComponent<Rigidbody>().useGravity = false;
                             carriedItemID = ChosenObj.GetComponent<NetworkIdentity>().netId;
+                            CmdPickUp(carriedItemID);
 
                         }
                         else
@@ -147,8 +170,14 @@ public class StaffNo3 : NetworkBehaviour
                 }
             }
         }
+        //plants get destroyed sometimes while being held
+        else if(ChosenObj == null)
+        {
+            objectheld = false;
+        }
         else
         {
+
             ChosenObj.GetComponent<Rigidbody>().MovePosition(StaffGrabber.transform.position);
 
 
@@ -176,8 +205,8 @@ public class StaffNo3 : NetworkBehaviour
 
 
 
-        Vector3 offset = ChosenObj.transform.position - lastPos;
-        Vector3 offsetrot = ChosenObj.transform.rotation.eulerAngles - lastPosRot;
+        //Vector3 offset = ChosenObj.transform.position - lastPos;
+        //Vector3 offsetrot = ChosenObj.transform.rotation.eulerAngles - lastPosRot;
 
 
 

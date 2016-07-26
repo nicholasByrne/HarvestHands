@@ -20,7 +20,10 @@ public class Plantscript : NetworkBehaviour {
     public Material HarvestMaterial;
     public GameObject plantProducePrefab;
 
-    [SyncVar] public bool isWatered = false;
+    [SyncVar]
+    public bool isWatered = false;
+    [SyncVar]
+    public bool isAlive = true;
     
 
     // Use this for initialization

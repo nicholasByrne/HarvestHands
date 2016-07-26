@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 
 
-public class Water : MonoBehaviour {
+public class Water : NetworkBehaviour {
 
     GameObject Bucket;
     GameObject WaterPuddle;
@@ -15,12 +16,21 @@ public class Water : MonoBehaviour {
     RaycastHit Hit;
 
     GameObject BucketWater;
-
-    bool bucketheld;
-
+    
+    [SyncVar]
     bool watertoggle;
 
-    float waterlevel;
+    [Tooltip("Current water level")]
+    [SyncVar]
+    public float waterlevel = 0.0f;
+
+    [Tooltip("How much is used to water a plant")]
+    [SyncVar]
+    public float waterdrain = 0.5f;
+
+    [Tooltip("How much water the bucket can hold")]
+    [SyncVar]
+    public float waterfill = 3.0f;
 
     // Use this for initialization
     void Start () {
@@ -32,8 +42,7 @@ public class Water : MonoBehaviour {
         Bucket = GameObject.Find("Bucket");
 
         watertoggle = false;
-        waterlevel = 0.0f;
-
+     
         
 	}
 	
@@ -124,54 +133,9 @@ public class Water : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(2) && waterlevel > 0)
         {
-            waterlevel -= 0.5f;
+            waterlevel -= waterdrain;
         }
-
-
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-
-        if (Physics.Raycast(ray, out Hit) && Input.GetMouseButton(1))
-        {
-            if (Hit.collider.tag == "Puddle")
-            {
-
-
-                if (PuddleEmpty == false)
-                {
-                    WaterPuddle.GetComponent<Renderer>().material.mainTexture = null;
-                    WaterPuddle.GetComponent<Renderer>().material.color = Color.grey;
-                    BucketWater.GetComponent<Renderer>().material.color = Color.blue;
-                    BucketFill = true;
-                    PuddleEmpty = true;
-                }
-
-
-                //   WaterPuddle.GetComponent<Renderer>().material.color = Color.white;
-                //  WaterPuddle.GetComponent<Renderer>().material.SetTexture(1 ,null);
-            }
-        }
-
-
-        if (Physics.Raycast(ray, out Hit) && Input.GetMouseButton(1))
-        {
-            if (Hit.collider.tag == "Puddle")
-            {
-
-                if (PuddleEmpty == true)
-                {
-                    //     WaterPuddle.GetComponent<Renderer>().material.mainTexture = Texture.;
-                    WaterPuddle.GetComponent<Renderer>().material.color = Color.blue;
-                    BucketWater.GetComponent<Renderer>().material.color = Color.grey;
-                    BucketFill = false;
-                    PuddleEmpty = false;
-                }
         
-            }
-
-        }
-
 
     }
 
@@ -182,14 +146,39 @@ public class Water : MonoBehaviour {
     {
         if (coll.gameObject.tag == "Water")
         {
-            waterlevel = 3.0f;
+            waterlevel = waterfill;
         
         
         }
 
+        if (coll.gameObject.tag == "Plant")
+        {
+            Debug.Log("Watered by collision");
+        }
+
+        
 
 
     }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "Plant")
+        {
+            Debug.Log("Watered");
+
+            if (waterlevel < 0)
+            {                
+                Plantscript plant = col.gameObject.GetComponent<Plantscript>();
+                if (!plant.isWatered)
+                {
+                    plant.isWatered = true;
+                    waterlevel -= waterdrain;
+                }
+            }
+        }
+    }
+
 
 
 }

@@ -22,7 +22,7 @@ public class DropOffZone : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("Produce"))
         {
-            Debug.Log(name.ToString() + " + " + col.name.ToString());
+            //Debug.Log(name.ToString() + " + " + col.name.ToString());
             PlantProduce produce = col.gameObject.GetComponent<PlantProduce>();
             shop.Score += produce.score;
             Destroy(produce.gameObject);
