@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class PlayerInventory : NetworkBehaviour {
 
@@ -15,6 +16,10 @@ public class PlayerInventory : NetworkBehaviour {
 	void Start ()
     {
         shop = GameObject.Find("GameManager").GetComponent<ShopScript>();
+        if (isLocalPlayer)
+        {
+            shop.playerUI = GetComponentInChildren<Canvas>().GetComponentInChildren<Text>();
+        }
 	}
 	
 	// Update is called once per frame

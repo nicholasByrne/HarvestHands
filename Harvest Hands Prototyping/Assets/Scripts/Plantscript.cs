@@ -2,9 +2,30 @@
 using System.Collections;
 using UnityEngine.Networking;
 
-public class Plantscript : NetworkBehaviour {
+public class Plantscript : NetworkBehaviour
+{
 
-    [SyncVar] public bool ReadyToHarvest = false;
+    public enum PlantState
+    {
+        Sapling,
+        Growing,
+        Grown,
+        Dead,
+    }
+
+    [System.Serializable]
+    public class MeshState
+    {
+        public Mesh mesh;
+        public Material material;
+    }
+
+    [SyncVar]
+    public bool ReadyToHarvest = false;
+    [SyncVar]
+    public bool isWatered = false;
+    [SyncVar]
+    public bool isAlive = true;
     [SyncVar]
     public NetworkInstanceId parentNetId;
 
@@ -20,14 +41,16 @@ public class Plantscript : NetworkBehaviour {
     public Material HarvestMaterial;
     public GameObject plantProducePrefab;
 
-    [SyncVar]
-    public bool isWatered = false;
-    [SyncVar]
-    public bool isAlive = true;
     
 
+    public MeshState sapling;
+    public MeshState growing;
+    public MeshState grown;
+    public MeshState dead;
+
+
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         if (ReadyToHarvest)
         {
@@ -45,24 +68,60 @@ public class Plantscript : NetworkBehaviour {
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
-	    
-	}
 
+    }
 
+    public void SwitchPlantState(PlantState state)
+    {
+        var meshFilter = GetComponent<MeshFilter>();
+        var rendered = GetComponent<Renderer>();
+        switch (state)
+        {
+            case PlantState.Sapling:
+                {
+                    meshFilter.mesh = sapling.mesh;
+                    rendered.material = sapling.material;
+                }
+                break;
+            case PlantState.Growing:
+                {
+                    meshFilter.mesh = growing.mesh;
+                    rendered.material = growing.material;
+                }
+                break;
+            case PlantState.Grown:
+                {
+                    meshFilter.mesh = grown.mesh;
+                    rendered.material = grown.material;
+                }
+                break;
+            case PlantState.Dead:
+                {
+                    meshFilter.mesh = dead.mesh;
+                    rendered.material = dead.material;
+                }
+                break;
+            default:
+                Debug.LogError("U wot m8!?");
+                break;
+        }
+    }
 
     [Command]
     public void CmdHarvest()
     {
-        //create produce
-        GameObject produce = Instantiate(plantProducePrefab);
-        produce.GetComponent<PlantProduce>().ProduceAmount = Random.Range(minSeedsProduced, maxSeedsProduced);
-        produce.transform.position = transform.position;
+        if (isAlive)
+        {
+            //create produce
+            GameObject produce = Instantiate(plantProducePrefab);
+            produce.GetComponent<PlantProduce>().ProduceAmount = Random.Range(minSeedsProduced, maxSeedsProduced);
+            produce.transform.position = transform.position;
 
-        //Spawn on server
-        NetworkServer.Spawn(produce);
-
+            //Spawn on server
+            NetworkServer.Spawn(produce);
+        }
         GetComponentInParent<SoilScript>().occupied = false;
 
         //destroy self

@@ -32,6 +32,7 @@ public class DayNightController : NetworkBehaviour
     [SerializeField]
     [Tooltip("Score lost per player that died")]
     int deathPenalty = 0;
+    
 
     
 	// Use this for initialization
@@ -59,7 +60,7 @@ public class DayNightController : NetworkBehaviour
             //currentTimeOfDay = 0;
             currentTimeOfDay = startDayAt;
             ingameDay++;
-            UpdatePlants();
+            CmdUpdatePlants();
             CheckPlayersSafe();            
         }
 
@@ -103,22 +104,47 @@ public class DayNightController : NetworkBehaviour
     {
         stars.transform.rotation = sun.transform.rotation;
     }
-
-    void UpdatePlants()
+    
+    [Command]
+    void CmdUpdatePlants()
     {
         foreach(GameObject plant in GameObject.FindGameObjectsWithTag("Plant"))
         {
+            if (!plant.GetComponent<Plantscript>())
+                continue;
+
             Plantscript plantScript = plant.GetComponent<Plantscript>();
             if(!plantScript.ReadyToHarvest)
             {
                 Debug.Log("hello");
+                //if grown
                 if (ingameDay >= plantScript.dayPlanted + plantScript.TimeToGrow)
                 {
                     plantScript.ReadyToHarvest = true;
-                    plantScript.GetComponent<Renderer>().material = plantScript.HarvestMaterial;
+                    RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Grown);
                 }
             }
+            else
+            {
+                plantScript.ReadyToHarvest = true;
+                plantScript.isAlive = false;
+                RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Dead);
+            }
         }
+    }
+
+    [ClientRpc]
+    void RpcSwapPlantGraphics(NetworkInstanceId id, Plantscript.PlantState state)
+    {
+        var plant = ClientScene.FindLocalObject(id);
+        if(plant == null)
+        {
+            Debug.LogError("Where is plant? ID: " + id.ToString());
+            return;
+        }
+
+        var plantScript = plant.GetComponent<Plantscript>();
+        plantScript.SwitchPlantState(state);
     }
 
     void CheckPlayersSafe()

@@ -167,7 +167,7 @@ public class Water : NetworkBehaviour {
         {
             Debug.Log("Watered");
 
-            if (waterlevel < 0)
+            if (waterlevel > 0)
             {                
                 Plantscript plant = col.gameObject.GetComponent<Plantscript>();
                 if (!plant.isWatered)
