@@ -264,7 +264,7 @@ public class StaffNo3 : NetworkBehaviour
                 Debug.Log(ChosenObj.GetComponent<Pickupable>().beingHeld);
             }
 
-            StaffGrabber.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.nearClipPlane + 4));
+            //StaffGrabber.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width / 2, Screen.height / 2, Camera.main.nearClipPlane + 4));
 
 
             if (Input.GetMouseButton(1))

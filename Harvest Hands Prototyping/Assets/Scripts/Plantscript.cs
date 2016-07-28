@@ -31,8 +31,16 @@ public class Plantscript : NetworkBehaviour
 
     [Tooltip("1.0 = 1 full day")]
     public float TimeToGrow;
+    [Tooltip("1.0 = 1 full day")]
+    public float dryDaysToDie = 2;
+    [Tooltip("Current amount of day spent unwatered")]
+    public float currentDryStreak = 0;
+    //counter for days which do not count towards growth
+    [HideInInspector]
+    public float dryDays = 0;
 
     public float dayPlanted;
+    [Tooltip("Not currently used")]
     public float timeOfDay;
 
     public int minSeedsProduced;

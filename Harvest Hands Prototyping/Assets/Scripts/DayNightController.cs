@@ -121,8 +121,9 @@ public class DayNightController : NetworkBehaviour
                 //if not grown yet
                 if (!plantScript.ReadyToHarvest)
                 {
+                    plantScript.currentDryStreak = 0;
                     //if ready to grow
-                    if (ingameDay >= plantScript.dayPlanted + plantScript.TimeToGrow)
+                    if (ingameDay >= plantScript.dayPlanted + plantScript.TimeToGrow - plantScript.dryDays)
                     {
                         plantScript.ReadyToHarvest = true;
                         RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Grown);
@@ -133,12 +134,20 @@ public class DayNightController : NetworkBehaviour
                     }
                 }
             }
-            //plant dies
+            //plant not watered
             else
             {
-                plantScript.ReadyToHarvest = true;
-                plantScript.isAlive = false;
-                RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Dead);
+                plantScript.currentDryStreak++;
+                plantScript.dryDays++;
+
+
+                //plant dies
+                if (plantScript.currentDryStreak >= plantScript.dryDaysToDie)
+                {
+                    plantScript.ReadyToHarvest = true;
+                    plantScript.isAlive = false;
+                    RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Dead);
+                }
             }
 
             plantScript.isWatered = false;
