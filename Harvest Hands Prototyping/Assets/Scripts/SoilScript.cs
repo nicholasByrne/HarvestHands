@@ -14,6 +14,7 @@ public class SoilScript : NetworkBehaviour {
 	void Start ()
     {
         dayNightController = GameObject.Find("GameManager").GetComponent<DayNightController>();
+        GetComponent<MeshRenderer>().enabled = false;
 	}
 	
 	// Update is called once per frame
@@ -33,7 +34,7 @@ public class SoilScript : NetworkBehaviour {
         //set plant details
         Plantscript plantScript = myNewPlant.GetComponent<Plantscript>();
         plantScript.dayPlanted = dayNightController.ingameDay;
-        plantScript.TimeToGrow = 1;
+        //plantScript.TimeToGrow = 1;
 
         plantScript.parentNetId = netId;
 

@@ -102,7 +102,8 @@ public class DayNightController : NetworkBehaviour
 
     void UpdateStars()
     {
-        stars.transform.rotation = sun.transform.rotation;
+        if (stars != null)
+            stars.transform.rotation = sun.transform.rotation;
     }
     
     [Command]
@@ -126,6 +127,10 @@ public class DayNightController : NetworkBehaviour
                         plantScript.ReadyToHarvest = true;
                         RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Grown);
                     }
+                    else
+                    {
+                        RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Growing);
+                    }
                 }
             }
             //plant dies
@@ -135,6 +140,8 @@ public class DayNightController : NetworkBehaviour
                 plantScript.isAlive = false;
                 RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Dead);
             }
+
+            plantScript.isWatered = false;
         }
     }
 

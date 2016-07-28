@@ -22,7 +22,7 @@ public class Plantscript : NetworkBehaviour
 
     [SyncVar]
     public bool ReadyToHarvest = false;
-    [SyncVar]
+    [SyncVar (hook = "OnWateredChange")]
     public bool isWatered = false;
     [SyncVar]
     public bool isAlive = true;
@@ -48,13 +48,28 @@ public class Plantscript : NetworkBehaviour
     public MeshState grown;
     public MeshState dead;
 
+    public Material wateredMaterial;
+    public Material dryMaterial;
+
+    Renderer renderer;
+
 
     // Use this for initialization
     void Start()
     {
-        if (ReadyToHarvest)
+        renderer = GetComponent<Renderer>();
+        //if (ReadyToHarvest)
+        //{
+        //    GetComponent<Renderer>().material = HarvestMaterial;
+        //}
+
+        if (isWatered)
         {
-            GetComponent<Renderer>().material = HarvestMaterial;
+            renderer.material = wateredMaterial;
+        }
+        else
+        {
+            renderer.material = dryMaterial;
         }
     }
 
@@ -76,37 +91,45 @@ public class Plantscript : NetworkBehaviour
     public void SwitchPlantState(PlantState state)
     {
         var meshFilter = GetComponent<MeshFilter>();
-        var rendered = GetComponent<Renderer>();
         switch (state)
         {
             case PlantState.Sapling:
                 {
                     meshFilter.mesh = sapling.mesh;
-                    rendered.material = sapling.material;
+                    //renderer.material = sapling.material;
                 }
                 break;
             case PlantState.Growing:
                 {
                     meshFilter.mesh = growing.mesh;
-                    rendered.material = growing.material;
+                    //renderer.material = growing.material;
                 }
                 break;
             case PlantState.Grown:
                 {
                     meshFilter.mesh = grown.mesh;
-                    rendered.material = grown.material;
+                    //renderer.material = grown.material;
                 }
                 break;
             case PlantState.Dead:
                 {
                     meshFilter.mesh = dead.mesh;
-                    rendered.material = dead.material;
+                    //renderer.material = dead.material;
                 }
                 break;
             default:
                 Debug.LogError("U wot m8!?");
                 break;
         }
+
+        //if (isWatered)
+        //{
+        //    renderer.material = wateredMaterial;
+        //}
+        //else
+        //{
+        //    renderer.material = dryMaterial;
+        //}
     }
 
     [Command]
@@ -143,5 +166,13 @@ public class Plantscript : NetworkBehaviour
         SwitchPlantState(state);
     }
 
+
+    void OnWateredChange(bool watered)
+    {
+        if (watered)
+            renderer.material = wateredMaterial;
+        else
+            renderer.material = dryMaterial;
+    }
 
 }

@@ -170,11 +170,14 @@ public class Water : NetworkBehaviour {
             if (waterlevel > 0)
             {                
                 Plantscript plant = col.gameObject.GetComponent<Plantscript>();
-                if (!plant.isWatered)
+                if (plant.isAlive)
                 {
-                    plant.isWatered = true;
-                    waterlevel -= waterdrain;
-                    plant.SwitchPlantState(Plantscript.PlantState.Growing);
+                    if (!plant.isWatered)
+                    {
+                        plant.isWatered = true;
+                        waterlevel -= waterdrain;
+                        //plant.SwitchPlantState(Plantscript.PlantState.Growing);
+                    }
                 }
             }
         }
