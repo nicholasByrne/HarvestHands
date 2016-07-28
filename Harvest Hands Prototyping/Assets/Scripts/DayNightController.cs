@@ -114,16 +114,21 @@ public class DayNightController : NetworkBehaviour
                 continue;
 
             Plantscript plantScript = plant.GetComponent<Plantscript>();
-            if(!plantScript.ReadyToHarvest)
+            //if watered
+            if (plantScript.isWatered)
             {
-                Debug.Log("hello");
-                //if grown
-                if (ingameDay >= plantScript.dayPlanted + plantScript.TimeToGrow)
+                //if not grown yet
+                if (!plantScript.ReadyToHarvest)
                 {
-                    plantScript.ReadyToHarvest = true;
-                    RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Grown);
+                    //if ready to grow
+                    if (ingameDay >= plantScript.dayPlanted + plantScript.TimeToGrow)
+                    {
+                        plantScript.ReadyToHarvest = true;
+                        RpcSwapPlantGraphics(plantScript.netId, Plantscript.PlantState.Grown);
+                    }
                 }
             }
+            //plant dies
             else
             {
                 plantScript.ReadyToHarvest = true;

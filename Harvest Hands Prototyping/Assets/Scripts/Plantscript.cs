@@ -129,4 +129,19 @@ public class Plantscript : NetworkBehaviour
         Debug.Log("PlantHarvested");
     }
 
+
+    [ClientRpc]
+    void RpcSwapPlantGraphics(Plantscript.PlantState state)
+    {
+        var plant = ClientScene.FindLocalObject(netId);
+        if (plant == null)
+        {
+            Debug.LogError("Where is plant? ID: " + netId.ToString());
+            return;
+        }
+        
+        SwitchPlantState(state);
+    }
+
+
 }

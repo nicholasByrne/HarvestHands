@@ -174,6 +174,7 @@ public class Water : NetworkBehaviour {
                 {
                     plant.isWatered = true;
                     waterlevel -= waterdrain;
+                    plant.SwitchPlantState(Plantscript.PlantState.Growing);
                 }
             }
         }
